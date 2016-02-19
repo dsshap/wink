@@ -11,7 +11,7 @@ module Wink
     end
 
     def reset
-      @api_endpoint  = ENV['WINK_ENDPOINT']
+      @endpoint      = ENV['WINK_ENDPOINT']
       @client_id     = ENV['WINK_CLIENT_ID']
       @client_secret = ENV['WINK_CLIENT_SECRET']
       @access_token  = ENV['WINK_ACCESS_TOKEN']
@@ -19,7 +19,7 @@ module Wink
     end
 
     def endpoint
-      @endpoint || 'https://winkapi.quirky.com'
+      @endpoint || 'https://api.wink.com'
     end
 
     def client_id

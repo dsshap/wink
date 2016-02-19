@@ -6,6 +6,12 @@ require "addressable/template"
 module Wink
   class Client
 
+    attr_accessor :access_token
+
+    def initialize(options={})
+      @access_token  = options[:access_token]
+    end
+
     # Public: Lookup all groups on your Wink account.
     #
     # Returns Array of Wink::Group instances.
@@ -60,6 +66,7 @@ module Wink
 
     def devices
       response = get('/users/me/wink_devices')
+      p response.body
       response.body["data"].collect do |device|
         if device.key?("garage_door_id")
           garage_door(device)
@@ -67,8 +74,24 @@ module Wink
           light_bulb(device)
         elsif device.key?("binary_switch_id")
           binary_switch(device)
+        elsif device.key?("hub_id") #must be last
+          hub(device)
         end
       end
+    end
+
+    # Public: Lookup an individual Wink Hub.
+    #
+    # hub - The Hash data of the device or device id to lookup.
+    #
+    # Returns Wink::Devices::Hub instance.
+    def hub(device)
+      unless device.is_a?(Hash)
+        response = get('/hubs{/hub}', :hub => device)
+        device   = response.body["data"]
+      end
+
+      Devices::Hub.new(self, device)
     end
 
     # Public: Lookup an individual light bulb device from your Wink Hub.
@@ -152,7 +175,7 @@ module Wink
         conn.response :json, :content_type => /\bjson$/
 
         # Authorization: Bearer 4b91e37b5742a8702204bc4829c46257
-        conn.authorization :bearer, Wink.access_token
+        conn.authorization :bearer, @access_token
 
         conn.adapter Faraday.default_adapter # make requests with Net::HTTP
       end

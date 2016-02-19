@@ -4,6 +4,7 @@ module Wink
 end
 
 require "wink/devices/device"
+require "wink/devices/hub"
 require "wink/devices/light_bulb"
 require "wink/devices/binary_switch"
 require "wink/devices/garage_door"
